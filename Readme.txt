@@ -1,0 +1,1 @@
+Keep line ending LF rather than CRLF to avoid eslint issues.
