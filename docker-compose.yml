@@ -1,6 +1,6 @@
 
 services:
-  backendapi1:
+  backendapi:
     image: exnodebackapi6
     container_name: exnodebackapi_6
     hostname: exnodebackapi_6
@@ -8,6 +8,21 @@ services:
       - "3000:3000" #kong will use 3000 in compose network
     depends_on:
       - postgres
+    networks:
+      - my-network
+  
+  #Modern Performance testing , needs test script
+  k6:
+    image: grafana/k6:latest
+    environment:
+      - K6_WEB_DASHBOARD=true
+    volumes:
+      - ./test/k6scripts:/scripts
+    entrypoint: ["k6", "run", "/scripts/test.js"]
+    ports:
+      - "5665:5665"
+    depends_on:
+      - backendapi
     networks:
       - my-network
 
