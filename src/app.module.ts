@@ -15,7 +15,7 @@ import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
+      host: 'postgres', //use postgres for compose and localhost otherwise
       port: 5432,
       username: 'testuser',
       password: 'testpassword',
