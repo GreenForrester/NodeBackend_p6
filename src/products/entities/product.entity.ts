@@ -1,31 +1,39 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+  Check,
+} from 'typeorm';
 
 @Entity()
+@Check(`"quantityInStock" >= 0 AND "buyPrice" >= 0 AND "msrp" >= 0`)
 export class Product {
   @PrimaryGeneratedColumn('uuid')
-  productId: string;
+  productId!: string;
 
   @Column()
-  productName: string;
+  productName!: string;
 
   @Column()
-  productvendor: string;
+  productvendor!: string;
 
   @Column()
-  productDescription: string;
+  productDescription!: string;
 
   @Column()
-  quantityInStock: number;
+  quantityInStock!: number;
 
-  @Column('float')
-  buyPrice: number;
+  @Column('int')
+  buyPrice!: number;
 
-  @Column('float')
-  msrp: number;
+  @Column('int')
+  msrp!: number;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  creationDate: Date;
+  @CreateDateColumn({ type: 'timestamptz' })
+  creationDate!: Date;
 
-  @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP', nullable: true })
-  modificationDate: Date;
+  @UpdateDateColumn({ type: 'timestamptz' })
+  modificationDate!: Date;
 }

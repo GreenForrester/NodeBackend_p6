@@ -1,44 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Customer } from './entities/customer.entity';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
-import { Customer } from './entities/customer.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-
+import { PaginationDto } from '../common/pagination.dto';
 @Injectable()
 export class CustomersService {
   constructor(
     @InjectRepository(Customer)
-    private customerRepository: Repository<Customer>,
+    private readonly repository: Repository<Customer>,
   ) {}
-  async create(createCustomerDto: CreateCustomerDto): Promise<Customer> {
-    try {
-      const customer = this.customerRepository.create(createCustomerDto);
-      return await this.customerRepository.save(customer);
-    } catch (error) {
-      console.log(error);
-      throw error; // for global error handling
-    }
+  async create(dto: CreateCustomerDto): Promise<Customer> {
+    return this.repository.save(this.repository.create(dto));
   }
-
-  async findAll(): Promise<Customer[]> {
-    return await this.customerRepository.find();
+  async findAll(p: PaginationDto) {
+    const [items, total] = await this.repository.findAndCount({
+      skip: p.offset,
+      take: p.limit,
+      order: { customerId: 'ASC' },
+    });
+    return { items, total, offset: p.offset, limit: p.limit };
   }
-
-  //Defining exception handling here to serve as pattern
   async findOne(id: string): Promise<Customer> {
-    return await this.customerRepository.findOne({ where: { customerId: id } });
+    const item = await this.repository.findOneBy({ customerId: id });
+    if (!item) throw new NotFoundException('Customer not found');
+    return item;
   }
-
-  async update(
-    id: string,
-    updateCustomerDto: UpdateCustomerDto,
-  ): Promise<Customer> {
-    await this.customerRepository.update(id, updateCustomerDto);
-    return await this.findOne(id);
+  async update(id: string, dto: UpdateCustomerDto): Promise<Customer> {
+    if (Object.keys(dto).length) {
+      const result = await this.repository.update(id, dto);
+      if (!result.affected) throw new NotFoundException('Customer not found');
+    }
+    return this.findOne(id);
   }
-
   async remove(id: string): Promise<void> {
-    await this.customerRepository.delete(id);
+    const result = await this.repository.delete(id);
+    if (!result.affected) throw new NotFoundException('Customer not found');
   }
 }

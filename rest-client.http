@@ -1,125 +1,24 @@
-GET http://localhost:3000/v1/api/
+@baseUrl = http://localhost:3000/v1/api
+@readKey = replace-with-your-read-key
+@writeKey = replace-with-your-write-key
 
-### 1. GET ALL THE CUSTOMERS
-GET http://localhost:3000/v1/api/customers/
+GET {{baseUrl}}/health/ready
 
-### 2. GET CUSTOMER BY ID
-GET http://localhost:3000/v1/api/customers/e0b0af25-0346-4f84-b388-a871e45ae16a
+### List customers
+GET {{baseUrl}}/customers?limit=20&offset=0
+x-api-key: {{readKey}}
 
-### 3. CREATE A NEW CUSTOMER
-POST http://localhost:3000/v1/api/customers/
+### Create a product (prices in minor units)
+POST {{baseUrl}}/products
+x-api-key: {{writeKey}}
 Content-Type: application/json
 
-{
-    "customerName": "Alpha Bravo",
-    "cemail": "Alpha.Bravo@example.com",
-    "phone": "+15555553333",
-    "address": "123 Main St",
-    "city": "Anytown",
-    "postalCode": "12345",
-    "country": "USA"
-  }
+{"productName":"Example","productvendor":"Vendor","productDescription":"Example product","quantityInStock":10,"buyPrice":100,"msrp":150}
 
-
-### 4. UPDATE CUSTOMER REQUEST
-PATCH  http://localhost:3000/v1/api/customers/aba73b51-b482-4cb1-8257-448b48356355
+### Create an order after replacing the IDs
+POST {{baseUrl}}/orders
+x-api-key: {{writeKey}}
+Idempotency-Key: example-order-001
 Content-Type: application/json
 
-{
-    "address": "ABC Street",
-    "city": "xyz town"
-}
-
-### 5. DELETE CUSTOMER REQUEST
-DELETE http://localhost:3000/v1/api/customers/e0b0af25-0346-4f84-b388-a871e45ae16a
-
-###----------------------------------------------------------------------------------------------
-
-### 1. GET ALL THE PRODUCTS
-GET http://localhost:3000/v1/api/products/
-
-### 2. GET PRODUCTS BY ID
-GET http://localhost:3000/v1/api/products/3b53eee7-4c2d-4388-a350-b1a12f0939db
-
-### 3. CREATE A NEW PRODUCTS
-POST http://localhost:3000/v1/api/products/
-Content-Type: application/json
-
-{
-    
-    "productName": "Mouse",
-    "productvendor": "Logitech",
-    "productDescription": "Optical Mouse",
-    "quantityInStock": 50,
-    "buyPrice": 30,
-    "msrp": 35.99
-}
-
-### 4. DELETE PRODUCTS REQUEST
-DELETE http://localhost:3000/v1/api/products/7aef9b8b-106d-44ea-9960-caf5e4f75e90
-
-
-### 5. UPDATE PRODUCTS REQUEST
-PATCH  http://localhost:3000/v1/api/products/aba73b51-b482-4cb1-8257-448b48356355
-Content-Type: application/json
-
-{
-    "quantityInStock": 99,
-    "buyPrice": 71,
-    "msrp": 129.99
-}
-
-###-------------------------------------------------------------------------
-
-### 1. GET ALL THE ORDERS
-GET http://localhost:3000/v1/api/orders/
-
-### 2. GET ORDERS BY ID
-GET http://localhost:3000/v1/api/orders/aba73b51-b482-4cb1-8257-448b48356355
-
- ### 4. DELETE Orders REQUEST
-DELETE  http://localhost:3000/v1/api/orders/7aef9b8b-106d-44ea-9960-caf5e4f75e90
-
-### 3. CREATE A NEW ORDER
-POST http://localhost:3000/v1/api/orders/
-Content-Type: application/json
-
-{
-    "orderDate": "2024-03-08T12:00:00.000Z",
-    "customerId": "aba73b51-b482-4cb1-8257-448b48356355",
-    "shippingDate": "2024-03-10T12:00:00.000Z",
-    "status": "Pending",
-    "comments": "Another order.",
-    "total": 150.50,
-    "paid": false,
-    "orderItems": [
-      {
-        "productId": "ea6b5a77-a23e-4225-8543-46f9153b36f4",
-        "productName": "Keyboard",
-        "quantity": 1
-      },
-      {
-        "productId": "a3fc60ce-3168-4812-8218-8ebdf22e27cf",
-        "productName": "Keyboard - type2",
-        "quantity": 1
-      }
-    ]
-  }
-
-### 5. UPDATE ORDERS REQUEST
-PATCH  http://localhost:3000/v1/api/orders/fa72fa5b-3401-4410-9d35-be25fc935e79
-Content-Type: application/json
-
-{
-
-  "status": "shipped",
-  "comments": "Very Fragile, handle with care.",
-
-  "orderItems": [
-    {
-      "productId": "ea6b5a77-a23e-4225-8543-46f9153b36f4",
-      "productName": "Product B",
-      "quantity": 1
-    }
-  ]
-}
+{"customerId":"00000000-0000-4000-8000-000000000001","orderItems":[{"productId":"00000000-0000-4000-8000-000000000002","quantity":1}]}

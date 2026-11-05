@@ -4,34 +4,39 @@ import {
   IsEmail,
   IsPhoneNumber,
   IsPostalCode,
+  MaxLength,
 } from 'class-validator';
 
 export class CreateCustomerDto {
   @IsNotEmpty()
   @IsString()
-  customerName: string;
+  @MaxLength(2000)
+  customerName!: string;
 
   @IsNotEmpty()
   @IsEmail()
-  cemail: string;
+  cemail!: string;
 
   @IsNotEmpty()
-  @IsPhoneNumber(null) // You can specify a region code if needed
-  phone: string;
-
-  @IsNotEmpty()
-  @IsString()
-  address: string;
+  @IsPhoneNumber() // You can specify a region code if needed
+  phone!: string;
 
   @IsNotEmpty()
   @IsString()
-  city: string;
-
-  @IsNotEmpty()
-  @IsPostalCode(null) // You can specify a locale if needed
-  postalCode: string;
+  @MaxLength(2000)
+  address!: string;
 
   @IsNotEmpty()
   @IsString()
-  country: string;
+  @MaxLength(2000)
+  city!: string;
+
+  @IsNotEmpty()
+  @IsPostalCode('any') // You can specify a locale if needed
+  postalCode!: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(2000)
+  country!: string;
 }

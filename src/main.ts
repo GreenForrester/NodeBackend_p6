@@ -1,9 +1,14 @@
 import { NestFactory } from '@nestjs/core';
+import { Logger } from '@nestjs/common';
 import { AppModule } from './app.module';
-
+import { setup } from './setup';
+import { integer } from './config';
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.setGlobalPrefix('v1/api'); // global prefix
-  await app.listen(process.env.PORT ?? 3000);
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
+  setup(app);
+  await app.listen(integer('PORT', 3000), '0.0.0.0');
 }
-bootstrap();
+void bootstrap().catch((error: unknown) => {
+  Logger.error(error);
+  process.exitCode = 1;
+});

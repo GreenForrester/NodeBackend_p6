@@ -1,20 +1,10 @@
-import { IsNotEmpty, IsNumber, IsUUID, IsString, Min } from 'class-validator';
-
+import { Transform } from 'class-transformer';
+import { IsInt, IsUUID, Min, Max } from 'class-validator';
 export class OrderItemDto {
-  @IsUUID()
-  @IsNotEmpty()
-  orderItemId: string;
-
-  @IsUUID()
-  @IsNotEmpty()
-  productId: string;
-
-  @IsString()
-  @IsNotEmpty()
-  productName: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  @Min(1)
-  quantity: number;
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.toLowerCase() : value,
+  )
+  @IsUUID('4')
+  productId!: string;
+  @IsInt() @Min(1) @Max(100000) quantity!: number;
 }

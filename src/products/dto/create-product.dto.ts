@@ -1,40 +1,42 @@
 import {
   IsNotEmpty,
-  IsNumber,
-  IsOptional,
+  IsInt,
+  Max,
+  MaxLength,
   IsString,
-  IsUUID,
   Min,
 } from 'class-validator';
 
 export class CreateProductDto {
-  @IsOptional()
-  @IsUUID()
-  productId?: string; //? for optional ID
+  @IsNotEmpty()
+  @IsString()
+  @MaxLength(2000)
+  productName!: string;
 
   @IsNotEmpty()
   @IsString()
-  productName: string;
-
-  @IsNotEmpty()
-  @IsString()
-  productvendor: string;
+  @MaxLength(2000)
+  productvendor!: string;
 
   @IsString()
-  productDescription: string;
+  @MaxLength(2000)
+  productDescription!: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsInt()
   @Min(0)
-  quantityInStock: number;
+  @Max(100000000)
+  quantityInStock!: number;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsInt()
   @Min(0)
-  buyPrice: number;
+  @Max(100000000)
+  buyPrice!: number;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsInt()
   @Min(0)
-  msrp: number;
+  @Max(100000000)
+  msrp!: number;
 }

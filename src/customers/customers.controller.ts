@@ -1,5 +1,8 @@
+import { PaginationDto } from '../common/pagination.dto';
 import {
   Controller,
+  ParseUUIDPipe,
+  Query,
   Get,
   Post,
   Body,
@@ -21,25 +24,25 @@ export class CustomersController {
   }
 
   @Get()
-  findAll() {
-    return this.customersService.findAll();
+  findAll(@Query() pagination: PaginationDto) {
+    return this.customersService.findAll(pagination);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.customersService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
     @Body() updateCustomerDto: UpdateCustomerDto,
   ) {
     return this.customersService.update(id, updateCustomerDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', new ParseUUIDPipe({ version: '4' })) id: string) {
     return this.customersService.remove(id);
   }
 }

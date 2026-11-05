@@ -1,3 +1,4 @@
+import { DataSource } from 'typeorm';
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrdersService } from './orders.service';
 
@@ -6,7 +7,7 @@ describe('OrdersService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [OrdersService],
+      providers: [OrdersService, { provide: DataSource, useValue: {} }],
     }).compile();
 
     service = module.get<OrdersService>(OrdersService);

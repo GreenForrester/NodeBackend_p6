@@ -2,6 +2,8 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
   OneToMany,
   Index,
 } from 'typeorm';
@@ -10,37 +12,37 @@ import { Order } from '../../orders/entities/order.entity';
 @Entity()
 export class Customer {
   @PrimaryGeneratedColumn('uuid')
-  customerId: string;
+  customerId!: string;
 
   @Index()
   @Column()
-  customerName: string;
+  customerName!: string;
 
   @Column({ unique: true })
-  cemail: string;
+  cemail!: string;
 
   @Column()
-  phone: string;
+  phone!: string;
 
   @Column()
-  address: string;
+  address!: string;
 
   @Column()
-  city: string;
+  city!: string;
 
   @Column()
-  postalCode: string;
+  postalCode!: string;
 
   @Column()
-  country: string;
+  country!: string;
 
-  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
-  creationDate: Date;
+  @CreateDateColumn({ type: 'timestamptz' })
+  creationDate!: Date;
 
-  @Column({ type: 'timestamp', onUpdate: 'CURRENT_TIMESTAMP', nullable: true })
-  modificationDate: Date;
+  @UpdateDateColumn({ type: 'timestamptz' })
+  modificationDate!: Date;
 
   //customer has many orders
   @OneToMany(() => Order, (order) => order.customer)
-  orders: Order[];
+  orders!: Order[];
 }

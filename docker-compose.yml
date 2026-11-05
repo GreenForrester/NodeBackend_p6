@@ -1,61 +1,54 @@
-
 services:
-  backendapi:
-    image: exnodebackapi6
-    container_name: exnodebackapi_6
-    hostname: exnodebackapi_6
-    ports:
-      - "3000:3000" #kong will use 3000 in compose network
-    depends_on:
-      - postgres
-    networks:
-      - my-network
-  
-  #Modern Performance testing , needs test script
-  k6:
-    image: grafana/k6:latest
-    environment:
-      - K6_WEB_DASHBOARD=true
-    volumes:
-      - ./test/k6scripts:/scripts
-    entrypoint: ["k6", "run", "/scripts/test.js"]
-    ports:
-      - "5665:5665"
-    depends_on:
-      - backendapi
-    networks:
-      - my-network
-
   postgres:
-    image: postgres:latest
-    container_name: postgres
+    image: postgres:17-alpine
     environment:
-      POSTGRES_USER: testuser
-      POSTGRES_PASSWORD: testpassword
-      POSTGRES_DB: testdatabase6
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${DB_USER:?Set DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME:?Set DB_NAME}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    networks:
-      - my-network
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: pgadmin
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  migrate:
+    build: .
+    env_file: .env
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@pgadmin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "15432:80"
+      DB_HOST: postgres
+      DB_PORT: 5432
+    command: ["node", "node_modules/typeorm/cli.js", "migration:run", "-d", "dist/database/cli.js"]
     depends_on:
-      - postgres
-    networks:
-      - my-network
-
+      postgres:
+        condition: service_healthy
+  backendapi:
+    build: .
+    env_file: .env
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/v1/api/health/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+  k6:
+    image: grafana/k6:1.0.0
+    profiles: ["load"]
+    environment:
+      API_READ_KEY: ${API_READ_KEY}
+      BASE_URL: http://backendapi:3000
+    volumes:
+      - ./test/k6scripts:/scripts:ro
+    command: ["run", "/scripts/test.js"]
+    depends_on:
+      backendapi:
+        condition: service_healthy
 volumes:
   postgres_data:
-
-networks:
-  my-network:
-    driver: bridge

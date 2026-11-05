@@ -1,49 +1,34 @@
-import { OrderItemDto } from '../dto/order-item.dto';
+import { Type, Transform } from 'class-transformer';
 import {
-  IsNotEmpty,
-  IsNumber,
   IsUUID,
-  IsString,
-  Min,
   IsDate,
-  IsBoolean,
+  ValidateIf,
+  IsString,
+  MaxLength,
   IsArray,
   ArrayMinSize,
+  ArrayMaxSize,
   ValidateNested,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-
+import { OrderItemDto } from './order-item.dto';
 export class CreateOrderDto {
-  @IsNotEmpty()
-  @IsDate()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.toLowerCase() : value,
+  )
+  @IsUUID('4')
+  customerId!: string;
+  @ValidateIf((_object, value: unknown) => value !== undefined)
   @Type(() => Date)
-  orderDate: Date;
-
-  @IsNotEmpty()
-  @IsUUID()
-  customerId: string;
-
-  @IsNotEmpty()
   @IsDate()
-  shippingDate: Date;
-
-  @IsNotEmpty()
+  shippingDate?: Date;
+  @ValidateIf((_object, value: unknown) => value !== undefined)
   @IsString()
-  status: string;
-
-  @IsString()
-  comments: string;
-
-  @IsNumber()
-  @Min(0)
-  total: number;
-
-  @IsBoolean()
-  paid: boolean;
-
+  @MaxLength(2000)
+  comments?: string;
   @IsArray()
   @ArrayMinSize(1)
+  @ArrayMaxSize(100)
   @ValidateNested({ each: true })
   @Type(() => OrderItemDto)
-  orderItems: OrderItemDto[];
+  orderItems!: OrderItemDto[];
 }

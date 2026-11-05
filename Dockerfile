@@ -1,28 +1,16 @@
-# official Node.js image as the base image
-FROM node:18-alpine
-
-# Set the working directory inside the container
-WORKDIR /usr/src/app
-
-# Copy package.json and package-lock.json to the working directory, test
+FROM node:24-alpine AS build
+WORKDIR /app
 COPY package*.json ./
-
-# Install dependencies
-RUN npm install
-RUN npm install typescript @types/node @types/express
-RUN npm install --save-dev tsc-watch
-RUN npm i -g @nestjs/cli
-
-
-# Copy the rest of the application code to the working directory
-COPY . .
-
-# Expose the port the app runs on
+RUN npm ci
+COPY tsconfig*.json nest-cli.json ./
+COPY src ./src
+RUN npm run build && npm prune --omit=dev --no-audit --no-fund
+FROM node:24-alpine AS runtime
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=node:node /app/package.json ./package.json
+USER node
 EXPOSE 3000
-
-# Build the TypeScript code
-RUN npm run build
-
-
-# Command to run the application
 CMD ["node", "dist/main.js"]
