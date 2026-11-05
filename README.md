@@ -6,11 +6,14 @@
 [![TypeORM](https://img.shields.io/badge/TypeORM-0.3-FE0803)](https://typeorm.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 A TypeScript commerce backend for managing **customers, products, inventory, and orders**.
 Built with **NestJS**, **TypeORM**, and **PostgreSQL**, the project demonstrates how a CRUD API
 can grow into a modular application with transactional order processing, safe retries, inventory
-protection, validated contracts, and a reproducible container deployment.
+protection, validated contracts, and a reproducible container deployment. It partially implements
+**Vertical Slice Architecture (VSA)** to a reasonable extent through feature-based modules, while
+retaining controller, service, and repository layers within each feature.
 
 Originally part of the **Stevaso Tech TypeScript End-to-End series, Part 6**, this repository also
 serves as a practical reference for learning backend architecture and commerce domain concepts.
@@ -637,6 +640,8 @@ adapt to these contracts.
 
 ## 📄 License
 
-The current [package.json](package.json) marks this project as **private** and **UNLICENSED**.
-No separate project license is included. This README does not grant a new license or change that
-status; dependency licenses remain their respective authors' terms.
+Copyright (c) 2024 **Burhan Saadi**. Licensed under the [MIT License](LICENSE).
+
+You may use, modify, distribute, sublicense, and sell copies of this software, provided that the
+copyright and permission notices are included in all copies or substantial portions. The software
+is provided **"as is"**, without warranty. Dependency licenses remain their respective authors' terms.
